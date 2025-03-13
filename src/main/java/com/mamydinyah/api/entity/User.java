@@ -1,6 +1,8 @@
 package com.mamydinyah.api.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 import java.util.Date;
@@ -13,7 +15,9 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
+    @Email(message = "Email should be valid")
     private String email;
+    @Size(min = 6, message = "Password must be at least 6 characters")
     private String password;
     private Date createdAt;
     private Date updatedAt;
