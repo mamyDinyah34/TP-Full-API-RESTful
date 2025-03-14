@@ -1,6 +1,7 @@
 package com.mamydinyah.api.security;
 
 import com.mamydinyah.api.security.jwt.JWTAuthenticationFilter;
+import com.mamydinyah.api.security.key.ApiKeyFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -18,9 +19,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class SecurityConfig {
     private final JWTAuthenticationFilter jwtAuthenticationFilter;
+    private final ApiKeyFilter apiKeyFilter;
 
-    public SecurityConfig(JWTAuthenticationFilter jwtAuthenticationFilter) {
+    public SecurityConfig(JWTAuthenticationFilter jwtAuthenticationFilter, ApiKeyFilter apiKeyFilter) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.apiKeyFilter = apiKeyFilter;
     }
 
     @Bean
@@ -33,8 +36,8 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(apiKeyFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-
         return http.build();
     }
 

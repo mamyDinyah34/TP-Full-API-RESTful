@@ -1,4 +1,6 @@
 package com.mamydinyah.api.security.jwt;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mamydinyah.api.dto.ErrorResponse;
 import com.mamydinyah.api.service.CustomUserDetailsService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -27,7 +29,31 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
+        if (request.getRequestURI().startsWith("/api/auth/")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String token = getJWTFromRequest(request);
+
+        if (!StringUtils.hasText(token)) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            response.getWriter().write(new ObjectMapper().writeValueAsString(
+                    new ErrorResponse("JWT token is missing")
+            ));
+            return;
+        }
+
+        if (!tokenGenerator.validateToken(token)) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            response.getWriter().write(new ObjectMapper().writeValueAsString(
+                    new ErrorResponse("Invalid JWT token")
+            ));
+            return;
+        }
+
         if (StringUtils.hasText(token) && tokenGenerator.validateToken(token)) {
             String username = tokenGenerator.getUsernameFromJWT(token);
 

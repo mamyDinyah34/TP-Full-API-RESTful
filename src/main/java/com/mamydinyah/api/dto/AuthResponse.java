@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 public class AuthResponse {
     private String message;
     private String token;
+    private String apiKey;
 
     public AuthResponse(String message) {
         this.message = message;

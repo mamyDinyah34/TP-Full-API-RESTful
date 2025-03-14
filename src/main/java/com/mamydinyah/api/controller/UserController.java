@@ -2,6 +2,8 @@ package com.mamydinyah.api.controller;
 
 import com.mamydinyah.api.dto.ErrorResponse;
 import com.mamydinyah.api.entity.User;
+import com.mamydinyah.api.repository.UserRepository;
+import com.mamydinyah.api.security.jwt.JWTGenerator;
 import com.mamydinyah.api.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -51,6 +53,7 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new ErrorResponse("User not found with id: " + id));
         }
+        user.setApiKey(existingUser.get().getApiKey());
         user.setId(id);
         User updatedUser = userService.updateUser(user);
         return ResponseEntity.ok(updatedUser);

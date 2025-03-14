@@ -3,6 +3,7 @@ package com.mamydinyah.api.controller;
 import com.mamydinyah.api.dto.AuthResponse;
 import com.mamydinyah.api.entity.User;
 import com.mamydinyah.api.security.jwt.JWTGenerator;
+import com.mamydinyah.api.security.key.ApiKeyGenerator;
 import com.mamydinyah.api.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +42,7 @@ public class AuthController {
         }
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setApiKey(ApiKeyGenerator.generateApiKey());
         userService.saveUser(user);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(new AuthResponse("User registered successfully"));
@@ -53,14 +55,23 @@ public class AuthController {
         }
 
         try {
+            // Authentifier l'utilisateur
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword())
             );
 
+            // Générer un token JWT
             String token = jwtGenerator.generateToken(authentication);
 
+            // Charger l'utilisateur depuis la base de données pour récupérer l'API-KEY
+            User authenticatedUser = userService.findByEmail(user.getEmail())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            // Créer la réponse avec le token JWT et l'API-KEY
             AuthResponse response = new AuthResponse("Login successful");
             response.setToken(token);
+            response.setApiKey(authenticatedUser.getApiKey()); // Utiliser l'API-KEY de l'utilisateur chargé
+
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new AuthResponse("Invalid email or password"));

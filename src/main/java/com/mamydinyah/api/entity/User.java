@@ -19,7 +19,7 @@ public class User {
     private String email;
     @Size(min = 6, message = "Password must be at least 6 characters")
     private String password;
+    private String apiKey;
     private Date createdAt;
     private Date updatedAt;
-
 }

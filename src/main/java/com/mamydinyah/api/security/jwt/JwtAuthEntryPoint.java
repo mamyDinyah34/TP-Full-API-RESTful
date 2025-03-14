@@ -1,3 +1,4 @@
+/*
 package com.mamydinyah.api.security.jwt;
 
 import jakarta.servlet.ServletException;
@@ -15,4 +16,4 @@ public class JwtAuthEntryPoint implements AuthenticationEntryPoint {
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
         response.sendError(HttpServletResponse.SC_UNAUTHORIZED, authException.getMessage());
     }
-}
+}*/
